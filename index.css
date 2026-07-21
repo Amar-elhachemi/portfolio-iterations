@@ -1,0 +1,263 @@
+:root {
+    --void: #0A0A0F;
+    --paper: #EDEAF7;
+    --primary: #B52FF7; /* Deep Purple replaces Lime */
+    --magenta: #FF2E92;
+    --orange: #FF5A1F;
+    --cyan: #00F0FF;
+    --line: rgba(237,234,247,0.16);
+    --glass: rgba(10,10,15,0.5);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--void);
+    color: var(--paper);
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: none;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+::selection {
+    background: var(--primary);
+    color: var(--void);
+}
+
+.mono { font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.02em; }
+.display { font-family: 'Archivo Black', sans-serif; line-height: 0.94; text-transform: uppercase; }
+
+/* Background Canvas */
+#scene-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 0;
+    display: block;
+    pointer-events: none;
+}
+
+/* Static Noise Overlay */
+.noise {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Custom Cursor */
+.cursor {
+    position: fixed; top: 0; left: 0; width: 16px; height: 16px;
+    border: 2px solid var(--primary); border-radius: 50%; pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%); mix-blend-mode: difference;
+    transition: width 0.15s, height 0.15s, background 0.15s, border-color 0.15s;
+}
+.cursor.hot {
+    width: 44px; height: 44px; background: var(--magenta); border-color: transparent;
+}
+.trail-dot {
+    position: fixed; top: 0; left: 0; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--primary); pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+}
+@media (max-width: 860px) { .cursor, .trail-dot { display: none; } body { cursor: auto; } }
+
+/* Scroll Sections */
+.scroll-container {
+    position: relative;
+    z-index: 20;
+    padding: 0 clamp(18px, 4vw, 48px);
+}
+
+.panel {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero {
+    justify-content: center;
+    text-align: center;
+}
+
+/* Updated Content Boxes for 3D Tilt and Iframes */
+.content-box {
+    position: relative;
+    overflow: hidden; /* Crop iframe */
+    background: var(--void);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 600px;
+    height: 500px;
+    
+    /* Smooth transition for mouse leave return */
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
+    will-change: transform;
+}
+
+/* The Mouse-Tracking Glow (Purple) */
+.content-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3; /* Above iframe, below overlay */
+    background: radial-gradient(
+        800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+        rgba(181, 47, 247, 0.15),
+        transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.content-box:hover::before {
+    opacity: 1;
+}
+
+.content-box:hover {
+    border-color: var(--primary);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 40px rgba(181, 47, 247, 0.2);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.1s linear;
+}
+
+.preview-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    pointer-events: none; /* Let clicks hit overlay, block scroll hijacking */
+    z-index: 1;
+    opacity: 0.6;
+    transition: opacity 0.5s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(1.01);
+}
+
+.content-box:hover .preview-iframe {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+.content-overlay {
+    position: relative;
+    z-index: 4;
+    padding: 40px;
+    background: linear-gradient(to top, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.6) 40%, rgba(10,10,15,0.1) 100%);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+/* For the hero sections without iframes */
+.content-box-hero {
+    background: var(--glass);
+    backdrop-filter: blur(12px) saturate(120%);
+    border: 1px solid var(--line);
+    padding: 40px;
+    max-width: 700px;
+    border-radius: 4px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+.eyebrow {
+    font-size: 13px;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 12px;
+    display: block;
+}
+
+h1.display {
+    font-size: clamp(48px, 8vw, 110px);
+    margin-bottom: 20px;
+}
+
+h2.display {
+    font-size: clamp(32px, 5vw, 64px);
+    margin-bottom: 16px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+}
+
+.glitchword {
+    color: var(--void);
+    background: var(--primary);
+    padding: 0 10px;
+    display: inline-block;
+    transform: rotate(-1.5deg);
+}
+
+.content-box p, .content-box-hero p {
+    font-size: 18px;
+    line-height: 1.5;
+    opacity: 0.85;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.btn-primary {
+    display: inline-table;
+    align-self: flex-start;
+    background: var(--primary);
+    color: var(--void);
+    border: none;
+    padding: 16px 26px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    cursor: none;
+    text-decoration: none;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-primary:hover {
+    background: var(--magenta);
+    color: var(--paper);
+    transform: scale(1.05) rotate(-1deg);
+}
+
+.scroll-indicator {
+    margin-top: 60px;
+    font-size: 12px;
+    color: var(--primary);
+    letter-spacing: 0.2em;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(10px); }
+    60% { transform: translateY(5px); }
+}
+
+/* Reveal Animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}

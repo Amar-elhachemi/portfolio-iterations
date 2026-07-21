@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Amar Elhachemi Cherki — Full-Stack Developer</title>
+<meta name="description" content="Amar Elhachemi Cherki — self-taught Laravel & Python developer building ELHASH.GG and Amar Web Studio. 12 public repos on GitHub.">
+<meta name="theme-color" content="#0a0202">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0202'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23FF2A2A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #0a0202;
+    --paper: #FAECEC;
+    --lime: #FF2A2A;
+    --cyan: #FFD700;
+    --magenta: #990000;
+    --violet: #FF8C00;
+    --line: rgba(255, 42, 42, 0.12);
+    --glass: rgba(16, 8, 8, 0.45);
+    --glass-hover: rgba(30, 10, 10, 0.75);
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { overflow-x: hidden; scroll-behavior: smooth; background: var(--void); }
+  
+  body {
+    background: var(--void); color: var(--paper);
+    font-family: 'Space Grotesk', sans-serif; cursor: none;
+    overflow-x: hidden; width: 100%; -webkit-font-smoothing: antialiased;
+  }
+  
+  ::selection { background: var(--lime); color: var(--void); }
+  .mono { font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.04em; }
+  .display { font-family: 'Archivo Black', sans-serif; line-height: 0.94; text-transform: uppercase; }
+
+  #scene-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: 0; display: block; }
+  .scene-fade-bottom { position: fixed; left: 0; right: 0; bottom: 0; height: 25vh; z-index: 1; pointer-events: none; background: linear-gradient(transparent, var(--void)); }
+  .noise { position: fixed; inset: 0; z-index: 1000; pointer-events: none; opacity: 0.04; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  .cursor {
+    position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+    border: 2px solid var(--lime); pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%); mix-blend-mode: difference;
+    transition: width 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                background 0.2s, border-color 0.2s;
+    border-radius: 50%;
+  }
+  .cursor.hot { width: 60px; height: 60px; background: var(--paper); border-color: transparent; mix-blend-mode: exclusion; }
+  @media (max-width: 860px) { .cursor { display: none; } body { cursor: auto; } }
+
+  .page { position: relative; z-index: 2; }
+  
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px clamp(20px, 5vw, 60px); border-bottom: 1px solid var(--line);
+    background: rgba(10, 2, 2, 0.6); backdrop-filter: blur(12px);
+  }
+  .logo { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+  .logo .dot { width: 10px; height: 10px; background: var(--lime); display: inline-block; box-shadow: 0 0 10px var(--lime); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+  
+  nav { display: flex; gap: clamp(16px, 3vw, 40px); align-items: center; }
+  nav a { color: var(--paper); text-decoration: none; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; position: relative; overflow: hidden; padding-bottom: 4px; }
+  nav a::after { content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: var(--lime); transform: translateX(-101%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  nav a:hover::after { transform: translateX(0); }
+  
+  .install-btn {
+    background: var(--paper); color: var(--void); border: none; padding: 10px 20px;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; cursor: none;
+    transition: background 0.3s, color 0.3s, transform 0.2s; border-radius: 2px;
+  }
+  .install-btn:hover { background: var(--lime); transform: translateY(-2px); }
+  @media (max-width: 720px) { nav a:not(.install-btn) { display: none; } }
+
+  .panel {
+    background: var(--glass); backdrop-filter: blur(20px) saturate(130%);
+    border: 1px solid var(--line); position: relative; overflow: hidden;
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+  .panel::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(600px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(255, 42, 42, 0.12), transparent 40%);
+    transition: opacity 0.3s;
+  }
+  .panel:hover::before { opacity: 1; }
+  .panel:hover { background: var(--glass-hover); border-color: rgba(255, 42, 42, 0.4); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5), 0 0 20px rgba(255, 42, 42, 0.1); }
+  .panel > * { position: relative; z-index: 1; }
+
+  .fly-pin { height: 100vh; height: 100dvh; overflow: hidden; }
+  .fly-inner { position: relative; height: 100%; max-width: 1200px; padding: 0 clamp(20px, 5vw, 60px); margin: 0 auto; display: flex; align-items: center; }
+  .cap { position: absolute; left: clamp(20px, 5vw, 60px); right: clamp(20px, 5vw, 60px); top: 50%; transform: translateY(-50%); }
+  .cap-content { opacity: 0; will-change: transform, filter, opacity; }
+  .cap .eyebrow { font-size: 14px; color: var(--lime); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .cap .eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--lime); display: block; }
+  .cap h1, .cap h2 { font-size: clamp(48px, 9vw, 110px); text-transform: uppercase; letter-spacing: -0.02em; }
+  .cap .glitchword { color: var(--void); background: var(--lime); padding: 0 12px; display: inline-block; transform: skewX(-10deg); }
+  .cap p.sub { max-width: 540px; font-size: 20px; line-height: 1.6; color: rgba(255,255,255,0.7); margin-top: 30px; font-weight: 400; }
+  
+  .fly-actions { position: absolute; left: clamp(20px, 5vw, 60px); bottom: 10vh; z-index: 5; display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+  .btn-primary { background: var(--lime); color: var(--void); padding: 18px 32px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; cursor: none; text-decoration: none; position: relative; overflow: hidden; display: inline-block; }
+  .btn-primary::after { content: ''; position: absolute; inset: 0; background: var(--void); transform: scaleX(0); transform-origin: right; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: -1; }
+  .btn-primary:hover { color: var(--lime); border-color: var(--lime); }
+  .btn-primary:hover::after { transform: scaleX(1); transform-origin: left; }
+  
+  .fly-progress { position: absolute; right: clamp(20px, 5vw, 60px); bottom: 10vh; z-index: 5; font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.15em; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+  .fly-progress .bar { width: 160px; height: 1px; background: rgba(255,255,255,0.2); position: relative; }
+  .fly-progress .bar i { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: var(--lime); box-shadow: 0 0 10px var(--lime); }
+
+  @media (max-width: 720px) {
+    .cap { top: 40%; }
+    .cap h1, .cap h2 { font-size: clamp(36px, 12vw, 60px); }
+    .cap p.sub { font-size: 16px; margin-top: 20px; }
+    .fly-actions { left: 20px; right: 20px; bottom: 12dvh; flex-direction: column; align-items: flex-start; gap: 16px; }
+    .btn-primary { width: 100%; text-align: center; }
+    .fly-progress { left: 20px; right: 20px; bottom: 5dvh; text-align: left; align-items: flex-start; }
+    .fly-progress .bar { width: 100%; }
+  }
+
+  .marquee-band { background: var(--lime); color: var(--void); overflow: hidden; white-space: nowrap; padding: 18px 0; transform: rotate(-2deg) scale(1.05); margin: 5vh 0 15vh; box-shadow: 0 0 30px rgba(255, 42, 42, 0.2); }
+  .marquee-track { display: inline-block; animation: scroll-left 25s linear infinite; }
+  .marquee-track span { display: inline-block; padding: 0 30px; font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Archivo Black'; }
+  @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  .section-pad { padding: 10vh clamp(20px, 5vw, 60px); max-width: 1400px; margin: 0 auto; perspective: 1200px; }
+  .section-head { margin-bottom: 60px; }
+  .section-head h2 { font-size: clamp(36px, 6vw, 64px); }
+  .section-head p { margin-top: 20px; font-size: 18px; color: rgba(255,255,255,0.7); max-width: 600px; line-height: 1.6; }
+  
+  .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; grid-auto-rows: minmax(220px, auto); transform-style: preserve-3d; }
+  
+  .bento-card { 
+    padding: 40px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 6px;
+    transform-style: preserve-3d; will-change: transform;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s, background 0.3s, box-shadow 0.3s;
+    animation: float-levitate 6s ease-in-out infinite alternate;
+  }
+
+  .bento-card:nth-child(1) { animation-delay: 0s; }
+  .bento-card:nth-child(2) { animation-delay: 1.5s; }
+  .bento-card:nth-child(3) { animation-delay: 3.0s; }
+  .bento-card:nth-child(4) { animation-delay: 4.5s; }
+
+  @keyframes float-levitate {
+    0% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
+    50% { transform: translateY(-6px) rotateX(1deg) rotateY(-1deg); }
+    100% { transform: translateY(0px) rotateX(-1deg) rotateY(1deg); }
+  }
+
+  .bento-card::after {
+    content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px;
+    border-radius: 6px; pointer-events: none; z-index: 2; opacity: 0;
+    background: linear-gradient(135deg, rgba(255,42,42,0.5) 0%, transparent 30%, transparent 70%, rgba(255,215,0,0.5) 100%);
+    transition: opacity 0.4s;
+  }
+  .bento-card:hover::after { opacity: 1; }
+
+  .bento-card .tag { font-size: 13px; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; transform: translateZ(20px); }
+  .bento-card h3 { font-size: 28px; font-family: 'Archivo Black'; text-transform: uppercase; margin-bottom: 16px; line-height: 1.1; transform: translateZ(30px); }
+  .bento-card p { font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.6; transform: translateZ(20px); }
+  
+  .telemetry-box {
+    margin-top: 24px; padding-top: 16px; border-top: 1px dashed rgba(255,255,255,0.15);
+    display: flex; flex-direction: column; gap: 10px; transform: translateZ(25px);
+  }
+  .telemetry-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .telemetry-bar-bg { width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; position: relative; }
+  .telemetry-bar-fill { height: 100%; background: var(--cyan); width: 0%; box-shadow: 0 0 8px var(--cyan); transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  
+  .status-beacon { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--lime); }
+  .status-beacon::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); animation: pulse 1.5s infinite; }
+
+  .c-span-8 { grid-column: span 8; }
+  .c-span-4 { grid-column: span 4; }
+  .c-span-6 { grid-column: span 6; }
+  
+  @media (max-width: 1024px) {
+    .bento-grid { display: flex; flex-direction: column; gap: 20px; }
+    .bento-card { padding: 30px; animation: none; }
+  }
+
+  .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; perspective: 1000px; }
+  
+  .t-card {
+    padding: 32px; display: flex; flex-direction: column; justify-content: space-between;
+    text-decoration: none; color: inherit; height: 100%; border-radius: 6px;
+    position: relative; overflow: hidden; transform-style: preserve-3d; will-change: transform;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+  .t-card:hover {
+    border-color: var(--lime);
+    box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6), 0 0 25px rgba(255, 42, 42, 0.15);
+  }
+  .t-card p { font-size: 16px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 30px; transform: translateZ(20px); }
+  
+  .t-module-interactive {
+    background: rgba(255, 215, 0, 0.04);
+    border: 1px dashed rgba(255, 215, 0, 0.3);
+    padding: 12px 16px; border-radius: 4px; margin-bottom: 20px;
+    font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    transform: translateZ(30px);
+  }
+  .t-module-interactive button {
+    background: var(--cyan); color: var(--void); border: none; padding: 6px 12px;
+    font-weight: 700; font-size: 11px; text-transform: uppercase; cursor: none;
+    border-radius: 2px; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; white-space: nowrap;
+  }
+  .t-module-interactive button:hover {
+    background: var(--lime); transform: scale(1.08); box-shadow: 0 0 12px var(--lime);
+  }
+
+  .t-bottom { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; transform: translateZ(15px); }
+  .t-name { font-family: 'IBM Plex Mono'; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--lime); }
+  .t-icon { width: 24px; height: 24px; fill: none; stroke: var(--paper); stroke-width: 2; opacity: 0.5; transition: opacity 0.3s, transform 0.3s; }
+  .t-card:hover .t-icon { opacity: 1; transform: translate(4px, -4px); stroke: var(--lime); }
+
+  .cta { margin: 15vh clamp(20px, 5vw, 60px); padding: 100px 40px; text-align: center; background: radial-gradient(circle at center, rgba(255,140,0,0.2) 0%, transparent 70%); border: 1px solid rgba(255,140,0,0.4); border-radius: 8px; backdrop-filter: blur(15px); position: relative; overflow: hidden; }
+  .cta h2 { font-size: clamp(40px, 7vw, 90px); margin-bottom: 24px; }
+  .cta p { margin: 0 auto 40px; max-width: 500px; color: rgba(255,255,255,0.7); font-size: 18px; line-height: 1.6; }
+  .btn-ghost { background: transparent; color: var(--paper); border: 1px solid var(--paper); padding: 18px 32px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; cursor: none; text-decoration: none; transition: background 0.3s, color 0.3s, box-shadow 0.3s; }
+  .btn-ghost:hover { background: var(--paper); color: var(--void); box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+
+  footer { padding: 40px clamp(20px, 5vw, 60px); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; font-size: 13px; color: rgba(255,255,255,0.5); border-top: 1px solid var(--line); background: var(--void); }
+  footer a { color: var(--paper); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--lime); }
+
+  .unravel-card {
+    opacity: 0;
+    transform: translateY(80px) scale(0.92) rotateX(15deg);
+    filter: blur(8px);
+    will-change: transform, opacity, filter;
+  }
+
+  .audio-toggle { position: fixed; right: 30px; bottom: 30px; z-index: 600; width: 50px; height: 50px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); background: var(--glass); color: var(--paper); display: flex; align-items: center; justify-content: center; cursor: none; font-size: 18px; transition: border-color 0.3s, transform 0.3s; backdrop-filter: blur(10px); }
+  .audio-toggle:hover { border-color: var(--lime); transform: scale(1.1); }
+  .audio-toggle[aria-pressed="true"] { background: var(--lime); color: var(--void); border-color: var(--lime); box-shadow: 0 0 15px rgba(255,42,42,0.4); }
+  
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<canvas id="scene-canvas"></canvas>
+<div class="scene-fade-bottom"></div>
+<div class="cursor" id="cursor"></div>
+<button class="audio-toggle mono" id="audio-toggle" type="button" aria-pressed="false" aria-label="Turn sound on">♪</button>
+
+<div class="page">
+  <header>
+    <div class="logo mono"><span class="dot"></span>AMAR ELHACHEMI</div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#goals">Goals</a>
+      <a href="#projects">Projects</a>
+      <a href="https://github.com/Amar-elhachemi" class="install-btn" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="fly-pin" id="fly">
+      <div class="fly-inner">
+        <div class="cap" id="cap-1">
+          <div class="cap-content">
+            <span class="eyebrow mono">System Online — 12 Repos Active</span>
+            <h1>Building things,<br>mostly in <span class="glitchword">Laravel.</span></h1>
+            <p class="sub">Amar Elhachemi Cherki — self-taught Laravel & Python developer, engineering scalable backends for ELHASH.GG and Amar Web Studio.</p>
+          </div>
+        </div>
+        <div class="cap" id="cap-2">
+          <div class="cap-content">
+            <span class="eyebrow mono">The Arsenal</span>
+            <h2>One Dev,<br>Lethal Tools.</h2>
+            <p class="sub">JavaScript · PHP · Laravel · MySQL · Python · Playwright. Engineered to build fast and break things faster.</p>
+          </div>
+        </div>
+        <div class="cap" id="cap-3">
+          <div class="cap-content">
+            <span class="eyebrow mono">Current Protocol</span>
+            <h2>Deep Dive:<br><span class="glitchword">Cybersec.</span></h2>
+            <p class="sub">Expanding into OSINT and cybersecurity fundamentals, heavily reinforcing Laravel architecture and automated Python workflows.</p>
+          </div>
+        </div>
+        <div class="cap" id="cap-4">
+          <div class="cap-content">
+            <span class="eyebrow mono">Deployments</span>
+            <h2>Keep<br>Shipping.</h2>
+            <p class="sub">Scroll to access the grid. Here is the architecture built so far, and the roadmap forward.</p>
+          </div>
+        </div>
+      </div>
+      <div class="fly-actions">
+        <a class="btn-primary" id="cta-hero" href="https://github.com/Amar-elhachemi" target="_blank" rel="noopener">Init GitHub_</a>
+        <span class="mono" style="font-size:13px; opacity:.7; display:flex; align-items:center; gap:8px;">
+          <span style="color:var(--lime); text-shadow:0 0 8px var(--lime); font-size:16px; font-weight:bold;" id="stat-count" data-target="12">0</span> PUBLIC REPOS
+        </span>
+      </div>
+      <div class="fly-progress mono">
+        Scroll to initialize
+        <div class="bar"><i id="fly-bar"></i></div>
+      </div>
+    </section>
+
+    <div class="marquee-band">
+      <div class="marquee-track mono">
+        <span>PHP ✦ LARAVEL ✦ MYSQL ✦ PYTHON ✦ JAVASCRIPT ✦ OSINT ✦ PHP ✦ LARAVEL ✦ MYSQL ✦ PYTHON ✦ JAVASCRIPT ✦ OSINT ✦</span>
+        <span>PHP ✦ LARAVEL ✦ MYSQL ✦ PYTHON ✦ JAVASCRIPT ✦ OSINT ✦ PHP ✦ LARAVEL ✦ MYSQL ✦ PYTHON ✦ JAVASCRIPT ✦ OSINT ✦</span>
+      </div>
+    </div>
+
+    <section class="section-pad" id="about">
+      <div class="section-head unravel-card">
+        <h2 class="display">System <span style="color:var(--cyan)">Specs</span></h2>
+        <p>The core infrastructure of my development stack, rendered with live system telemetry and 3D depth.</p>
+      </div>
+      
+      <div class="bento-grid" id="tilt-grid-specs">
+        <div class="bento-card panel c-span-8 unravel-card" data-tilt>
+          <div>
+            <span class="tag mono"><span>01 — Core Infrastructure</span> <span class="status-beacon">ONLINE</span></span>
+            <h3>JavaScript, PHP, Laravel</h3>
+            <p>Full-stack foundation augmented with MySQL and Python. Architecting freelance web infrastructure and robust Python automation scripts since 2023. Capable of handling complex relational databases and modern API design.</p>
+          </div>
+          <div class="telemetry-box mono">
+            <div class="telemetry-row"><span>Stack Load Allocation</span> <span id="tele-val-1">88%</span></div>
+            <div class="telemetry-bar-bg"><div class="telemetry-bar-fill" style="width: 88%; background: var(--cyan);"></div></div>
+          </div>
+        </div>
+
+        <div class="bento-card panel c-span-4 unravel-card" style="border-color: rgba(153, 0, 0, 0.4);" data-tilt>
+          <div>
+            <span class="tag mono" style="color:var(--magenta);"><span>02 — Security & OSINT</span> <span>[ENCRYPTED]</span></span>
+            <h3>Cybersecurity</h3>
+            <p>Actively expanding knowledge vectors into OSINT and penetration testing fundamentals alongside an IT/management technician program.</p>
+          </div>
+          <div class="telemetry-box mono">
+            <div class="telemetry-row" style="color:var(--magenta);"><span>Vector Scan Status</span> <span id="tele-val-2">SECURE</span></div>
+            <div class="telemetry-bar-bg"><div class="telemetry-bar-fill" style="width: 65%; background: var(--magenta); box-shadow: 0 0 8px var(--magenta);"></div></div>
+          </div>
+        </div>
+
+        <div class="bento-card panel c-span-6 unravel-card" data-tilt>
+          <div>
+            <span class="tag mono"><span>03 — Live Product</span> <span class="status-beacon" style="color:var(--cyan);">v1.4 DEPLOYED</span></span>
+            <h3>ELHASH.GG</h3>
+            <p>A high-performance Laravel toolkit engineered for CS2 and Valorant players. Features include dynamic crosshair generators, live pro settings databases, interactive map callouts, and strategic utility calculators.</p>
+          </div>
+          <div class="telemetry-box mono">
+            <div class="telemetry-row"><span>Server Response Time</span> <span id="tele-val-3">14ms [OPTIMAL]</span></div>
+            <div class="telemetry-bar-bg"><div class="telemetry-bar-fill" style="width: 94%; background: var(--lime);"></div></div>
+          </div>
+        </div>
+
+        <div class="bento-card panel c-span-6 unravel-card" data-tilt>
+          <div>
+            <span class="tag mono"><span>04 — Automation Hub</span> <span class="mono" style="color:var(--lime);">AUTONOMOUS</span></span>
+            <h3>Amar Web Studio</h3>
+            <p>A specialized lead-gen and rapid-deployment web agency. Built a custom Python/Playwright Google Maps scraper that automatically identifies local businesses lacking web presence to pitch high-conversion templates.</p>
+          </div>
+          <div class="telemetry-box mono">
+            <div class="telemetry-row"><span>Scraper Throughput</span> <span id="tele-val-4">342 NODES/HR</span></div>
+            <div class="telemetry-bar-bg"><div class="telemetry-bar-fill" style="width: 76%; background: var(--violet); box-shadow: 0 0 8px var(--violet);"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad" id="goals">
+      <div class="section-head unravel-card">
+        <h2 class="display">Target <span style="color:var(--lime)">Vectors</span></h2>
+      </div>
+      <div class="bento-grid" style="grid-template-columns: repeat(3, 1fr);" id="tilt-grid-goals">
+        <div class="bento-card panel unravel-card" data-tilt>
+          <span class="tag mono">Phase 1</span>
+          <h3>Full-Stack Roles</h3>
+          <p>Integrating web development, automation, and product thinking. Targeting environments in gaming tech, developer tools, or bespoke B2B solutions.</p>
+          <div class="telemetry-box mono" style="margin-top:20px;"><div class="telemetry-row"><span>Status</span><span style="color:var(--lime);">IN PROGRESS</span></div></div>
+        </div>
+        <div class="bento-card panel unravel-card" data-tilt>
+          <span class="tag mono">Phase 2</span>
+          <h3>Advanced Sec</h3>
+          <p>Deepening OSINT capabilities and pushing the limits of Laravel's structural architecture and Python's automation potential.</p>
+          <div class="telemetry-box mono" style="margin-top:20px;"><div class="telemetry-row"><span>Status</span><span style="color:var(--cyan);">PRIMING</span></div></div>
+        </div>
+        <div class="bento-card panel unravel-card" data-tilt>
+          <span class="tag mono">Phase 3</span>
+          <h3>Product Scale</h3>
+          <p>Scaling ELHASH.GG and Amar Web Studio from tactical side-projects into fully monetized, self-sustaining SaaS products.</p>
+          <div class="telemetry-box mono" style="margin-top:20px;"><div class="telemetry-row"><span>Status</span><span style="color:var(--violet);">PLANNED</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad" id="projects">
+      <div class="section-head unravel-card">
+        <h2 class="display">Public <span style="color:var(--violet)">Modules</span></h2>
+        <p>Interactive live-simulation cards connected directly to the open-source pipeline.</p>
+      </div>
+      <div class="project-grid" id="tilt-grid-projects">
+        
+        <div class="t-card panel unravel-card" data-repo="elhash-gg" data-tilt>
+          <div>
+            <p>A modern gaming toolkit built with Laravel, featuring CS2, Valorant, and competitive gaming utilities.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-elhash-gg">Status: Stable [v1.4]</span>
+              <button type="button" onclick="triggerModuleAction(event, 'elhash-gg')">Test Load</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/elhash-gg" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">elhash-gg</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="portfolio-websites" data-tilt>
+          <div>
+            <p>High-conversion website templates for restaurants, cafés, and barbershops — the Amar Web Studio product line.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-portfolio-websites">Templates: 5 Active</span>
+              <button type="button" onclick="triggerModuleAction(event, 'portfolio-websites')">Preview</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/portfolio-websites" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">portfolio-websites</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="gmaps-scraper" data-tilt>
+          <div>
+            <p>An advanced Playwright-based Google Maps scraper for autonomous local business lead generation.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-gmaps-scraper">Leads Found: 342</span>
+              <button type="button" onclick="triggerModuleAction(event, 'gmaps-scraper')">Run Sweep</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/gmaps-scraper" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">gmaps-scraper</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="business-hunter-pro" data-tilt>
+          <div>
+            <p>Comprehensive lead-generation tooling for identifying high-value business targets.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-business-hunter-pro">Queue: Standby</span>
+              <button type="button" onclick="triggerModuleAction(event, 'business-hunter-pro')">Dispatch</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/business-hunter-pro" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">business-hunter-pro</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="3d-portfolio" data-tilt>
+          <div>
+            <p>An interactive, WebGL-powered 3D portfolio experience.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-3d-portfolio">FPS: 60 [Optimal]</span>
+              <button type="button" onclick="triggerModuleAction(event, '3d-portfolio')">Stress Test</button>
+            </div>
+          </div>
+          <a href="https://www.elhashmix.xyz" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">3d-portfolio</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="cs2-crosshair-generator" data-tilt>
+          <div>
+            <p>A fast, client-side crosshair generator for CS2, built in vanilla JavaScript.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-cs2-crosshair-generator">Style: Dot / Classic</span>
+              <button type="button" onclick="triggerModuleAction(event, 'cs2-crosshair-generator')">Randomize</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/cs2-crosshair-generator" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">cs2-crosshair-gen</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="reels-trend-scraper" data-tilt>
+          <div>
+            <p>A data-mining Python scraper specifically tuned for tracking Instagram Reels trends.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-reels-trend-scraper">Hashtags: #Laravel #Dev</span>
+              <button type="button" onclick="triggerModuleAction(event, 'reels-trend-scraper')">Fetch Trends</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/reels-trend-scraper" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">reels-trend-scraper</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="Password-manager" data-tilt>
+          <div>
+            <p>A secure, encrypted local password manager utility.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-Password-manager">AES-256: Locked</span>
+              <button type="button" onclick="triggerModuleAction(event, 'Password-manager')">Gen Token</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/Password-manager" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">Password-manager</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+        <div class="t-card panel unravel-card" data-repo="workspace-organizer" data-tilt>
+          <div>
+            <p>A Python automation tool to instantly organize chaotic developer workspaces.</p>
+            <div class="t-module-interactive">
+              <span class="mono" id="sim-workspace-organizer">Files Sorted: 0</span>
+              <button type="button" onclick="triggerModuleAction(event, 'workspace-organizer')">Auto-Clean</button>
+            </div>
+          </div>
+          <a href="https://github.com/Amar-elhachemi/workspace-organizer" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="t-bottom"><span class="t-name">workspace-organizer</span><svg class="t-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="cta unravel-card" id="get" data-tilt>
+      <h2 class="display">Establish Connection</h2>
+      <p>Open to full-stack roles, freelance architecture, or just talking Laravel internals and CS2 mechanics.</p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-top: 30px; transform: translateZ(30px);">
+        <a class="btn-primary" id="cta-bottom" href="https://github.com/Amar-elhachemi" target="_blank">Execute GitHub</a>
+        <a class="btn-ghost" href="mailto:amar.elhachemi.cherki@gmail.com">Ping Email</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="mono">© AMAR ELHACHEMI CHERKI — ORAN, DZ — STILL SHIPPING</div>
+    <div style="display:flex; gap:30px;">
+      <a href="https://github.com/Amar-elhachemi" class="mono" target="_blank">GITHUB</a>
+      <a href="https://www.linkedin.com/in/amarelhachemicherki" class="mono" target="_blank">LINKEDIN</a>
+    </div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/RGBShiftShader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  const cursor = document.getElementById('cursor');
+  window.addEventListener('mousemove', (e) => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  
+  document.querySelectorAll('a, button, .bento-card, .t-card').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hot'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hot'));
+  });
+
+  document.querySelectorAll('.panel').forEach(panel => {
+    panel.addEventListener('mousemove', e => {
+      const rect = panel.getBoundingClientRect();
+      panel.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+      panel.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+    });
+  });
+
+  if (!prefersReduced && window.innerWidth > 860) {
+    const tiltElements = document.querySelectorAll('[data-tilt]');
+    tiltElements.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -8;
+        const rotateY = ((x - centerX) / centerX) * 8;
+        
+        card.style.animationPlayState = 'paused';
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(10px) scale3d(1.02, 1.02, 1.02)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)`;
+        card.style.animationPlayState = 'running';
+      });
+    });
+  }
+
+  setInterval(() => {
+    const teleVal1 = document.getElementById('tele-val-1');
+    const teleVal3 = document.getElementById('tele-val-3');
+    const teleVal4 = document.getElementById('tele-val-4');
+    if(teleVal1) {
+      let randLoad = Math.floor(82 + Math.random() * 14);
+      teleVal1.textContent = `${randLoad}%`;
+      teleVal1.nextElementSibling.firstElementChild.style.width = `${randLoad}%`;
+    }
+    if(teleVal3 && Math.random() > 0.5) {
+      let randPing = Math.floor(11 + Math.random() * 6);
+      teleVal3.textContent = `${randPing}ms [OPTIMAL]`;
+    }
+    if(teleVal4 && Math.random() > 0.6) {
+      let randNodes = Math.floor(340 + Math.random() * 18);
+      teleVal4.textContent = `${randNodes} NODES/HR`;
+    }
+  }, 3500);
+
+  const statEl = document.getElementById('stat-count');
+  let countObj = { val: 0 };
+  gsap.to(countObj, { 
+    val: parseInt(statEl.dataset.target), duration: 2, ease: "power2.out", 
+    onUpdate: () => { statEl.textContent = Math.round(countObj.val); } 
+  });
+
+  function triggerModuleAction(event, repoName) {
+    event.preventDefault();
+    event.stopPropagation();
+    playBlip(950, 'triangle');
+    
+    const labelEl = document.getElementById(`sim-${repoName}`);
+    const cardEl = document.querySelector(`[data-repo="${repoName}"]`);
+    
+    if(!labelEl || !cardEl) return;
+
+    gsap.to(cardEl, { scale: 1.06, borderColor: 'var(--lime)', duration: 0.15, yoyo: true, repeat: 1 });
+
+    switch(repoName) {
+      case 'elhash-gg':
+        labelEl.textContent = 'Compiling Laravel routes...';
+        setTimeout(() => labelEl.textContent = 'Status: Optimized [200 OK]', 800);
+        break;
+      case 'portfolio-websites':
+        const templates = ['Café Theme Active', 'Barber UI Active', 'Restaurant Pro Active', 'Agency Dark Active'];
+        let randTpl = templates[Math.floor(Math.random() * templates.length)];
+        labelEl.textContent = 'Injecting CSS...';
+        setTimeout(() => labelEl.textContent = randTpl, 800);
+        break;
+      case 'gmaps-scraper':
+        let randomLeads = Math.floor(340 + Math.random() * 50);
+        labelEl.textContent = 'Scraping Map Nodes...';
+        setTimeout(() => labelEl.textContent = `Leads Found: ${randomLeads}`, 900);
+        break;
+      case 'business-hunter-pro':
+        labelEl.textContent = 'Scanning Prospects...';
+        setTimeout(() => labelEl.textContent = 'Queue: 14 Targets Locked', 850);
+        break;
+      case '3d-portfolio':
+        labelEl.textContent = 'Compiling Shaders...';
+        setTimeout(() => labelEl.textContent = 'FPS: 120 [Boosted]', 800);
+        break;
+      case 'cs2-crosshair-generator':
+        const crosshairs = ['Style: Dot [Cyan]', 'Style: T-Shape [Lime]', 'Style: Classic [White]'];
+        labelEl.textContent = 'Randomizing Vectors...';
+        setTimeout(() => labelEl.textContent = crosshairs[Math.floor(Math.random() * crosshairs.length)], 700);
+        break;
+      case 'reels-trend-scraper':
+        labelEl.textContent = 'Mining IG Graph...';
+        setTimeout(() => labelEl.textContent = 'Trending: Audio Viral #1', 900);
+        break;
+      case 'Password-manager':
+        labelEl.textContent = 'Generating Salt...';
+        setTimeout(() => labelEl.textContent = 'AES-256: Hash Verified', 800);
+        break;
+      case 'workspace-organizer':
+        let sortedCount = Math.floor(10 + Math.random() * 40);
+        labelEl.textContent = 'Moving binaries...';
+        setTimeout(() => labelEl.textContent = `Files Sorted: ${sortedCount}`, 800);
+        break;
+    }
+  }
+
+  document.querySelectorAll('.section-pad, .cta').forEach(section => {
+    const cards = section.querySelectorAll('.unravel-card');
+    if(cards.length > 0) {
+      gsap.to(cards, {
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotateX: 0,
+        filter: 'blur(0px)',
+        duration: 1.1,
+        stagger: 0.15,
+        ease: 'power3.out'
+      });
+    }
+  });
+
+  let audioCtx, audioEnabled = false;
+  const toggleBtn = document.getElementById('audio-toggle');
+  function playBlip(freq, type = 'sine') {
+    if(!audioEnabled) return;
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+  }
+  toggleBtn.addEventListener('click', () => {
+    audioEnabled = !audioEnabled;
+    toggleBtn.setAttribute('aria-pressed', audioEnabled);
+    toggleBtn.style.color = audioEnabled ? 'var(--void)' : 'var(--paper)';
+    if(audioEnabled) playBlip(800, 'triangle');
+  });
+  document.querySelectorAll('.btn-primary, .t-card, .bento-card').forEach(el => {
+    el.addEventListener('mouseenter', () => playBlip(600 + Math.random()*200));
+  });
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0202, 0.02);
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.set(0, 0, 10);
+  
+  const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene-canvas'), alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const composer = new THREE.EffectComposer(renderer);
+  composer.addPass(new THREE.RenderPass(scene, camera));
+  const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.4, 0.2);
+  composer.addPass(bloomPass);
+  const rgbShiftPass = new THREE.ShaderPass(THREE.RGBShiftShader);
+  rgbShiftPass.uniforms['amount'].value = 0.0015;
+  composer.addPass(rgbShiftPass);
+
+  // NEW: Advanced Quantum Armillary Sphere
+  const coreMesh = new THREE.Group();
+  const coreMat = new THREE.MeshBasicMaterial({ color: 0xFF2A2A, wireframe: true, transparent: true, opacity: 0.15 });
+  
+  const innerGeo = new THREE.IcosahedronGeometry(1.2, 1);
+  const innerMesh = new THREE.Mesh(innerGeo, coreMat);
+  coreMesh.add(innerMesh);
+
+  const ringGeo1 = new THREE.TorusGeometry(2.0, 0.04, 16, 100);
+  const ring1 = new THREE.Mesh(ringGeo1, coreMat);
+  ring1.rotation.x = Math.PI / 2;
+  coreMesh.add(ring1);
+
+  const ringGeo2 = new THREE.TorusGeometry(2.3, 0.04, 16, 100);
+  const ring2 = new THREE.Mesh(ringGeo2, coreMat);
+  ring2.rotation.y = Math.PI / 3;
+  ring2.rotation.x = Math.PI / 4;
+  coreMesh.add(ring2);
+  
+  const ringGeo3 = new THREE.TorusGeometry(2.6, 0.04, 16, 100);
+  const ring3 = new THREE.Mesh(ringGeo3, coreMat);
+  ring3.rotation.y = -Math.PI / 3;
+  ring3.rotation.x = -Math.PI / 4;
+  coreMesh.add(ring3);
+
+  scene.add(coreMesh);
+
+  // NEW: Sharp Crystalline Cyber-Spikes
+  const shardGeo = new THREE.CylinderGeometry(0, 0.15, 1.2, 4); 
+  const shards = [];
+  const shardColors = [0xFFD700, 0x990000, 0xFF2A2A];
+  for(let i=0; i<18; i++) {
+    const sMat = new THREE.MeshBasicMaterial({ color: shardColors[i % 3], wireframe: true, transparent: true, opacity: 0.6 });
+    const shard = new THREE.Mesh(shardGeo, sMat);
+    shard.userData = {
+      orbitRadius: 3.5 + Math.random() * 4,
+      orbitSpeed: 0.2 + Math.random() * 0.5,
+      rotSpeedX: (Math.random() - 0.5) * 4,
+      rotSpeedY: (Math.random() - 0.5) * 4,
+      offsetAngle: Math.random() * Math.PI * 2
+    };
+    scene.add(shard);
+    shards.push(shard);
+  }
+
+  const tunnelGeo = new THREE.CylinderGeometry(12, 12, 100, 64, 32, true);
+  const tunnelOriginalPos = new Float32Array(tunnelGeo.attributes.position.array);
+  const tunnelMat = new THREE.MeshBasicMaterial({ color: 0xFF8C00, wireframe: true, transparent: true, opacity: 0.05 });
+  const tunnelMesh = new THREE.Mesh(tunnelGeo, tunnelMat);
+  tunnelMesh.rotation.x = Math.PI / 2;
+  scene.add(tunnelMesh);
+
+  const terrainGeo = new THREE.PlaneGeometry(200, 200, 64, 64);
+  const terrainMat = new THREE.MeshBasicMaterial({ color: 0xFF8C00, wireframe: true, transparent: true, opacity: 0.0 });
+  const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+  terrainMesh.rotation.x = -Math.PI / 2;
+  terrainMesh.position.y = -10;
+  scene.add(terrainMesh);
+
+  function createCircleTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0, 'rgba(255,255,255,1)');
+    gradient.addColorStop(0.3, 'rgba(255,255,255,0.8)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(canvas);
+  }
+  const softDotTexture = createCircleTexture();
+
+  const particlesGeo = new THREE.BufferGeometry();
+  const particleCount = 1200;
+  const posArray = new Float32Array(particleCount * 3);
+  for(let i=0; i < particleCount * 3; i+=3) {
+    posArray[i] = (Math.random() - 0.5) * 30;
+    posArray[i+1] = (Math.random() - 0.5) * 30;
+    posArray[i+2] = (Math.random() - 0.5) * 100;
+  }
+  particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+  
+  const particlesMat = new THREE.PointsMaterial({ 
+    color: 0xFFD700, size: 0.25, map: softDotTexture, 
+    transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+  scene.add(particlesMesh);
+
+  let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+  window.addEventListener('mousemove', e => {
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.002;
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.002;
+  });
+
+  const clock = new THREE.Clock();
+  const flyState = { progress: 0 };
+  
+  const colorLime = new THREE.Color(0xFF2A2A);
+  const colorMagenta = new THREE.Color(0x990000);
+  const colorViolet = new THREE.Color(0xFF8C00);
+  const colorCyan = new THREE.Color(0xFFD700);
+  
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+    const time = clock.getElapsedTime();
+    
+    targetX += (mouseX - targetX) * 0.05;
+    targetY += (mouseY - targetY) * 0.05;
+    
+    if(!prefersReduced) {
+      const spinSpeedMultiplier = 1 + (flyState.progress * 3);
+      
+      // Animate the entire Group and inner geometries
+      coreMesh.rotation.x += 0.1 * delta * spinSpeedMultiplier;
+      coreMesh.rotation.y += 0.2 * delta * spinSpeedMultiplier;
+      
+      // Counter-rotate the rings slightly for complex mechanical look
+      coreMesh.children[1].rotation.z -= 0.5 * delta;
+      coreMesh.children[2].rotation.x += 0.5 * delta;
+      coreMesh.children[3].rotation.y -= 0.5 * delta;
+
+      const pulse = 1 + Math.sin(time * 2) * 0.08;
+      coreMesh.scale.set(pulse, pulse, pulse);
+
+      tunnelMesh.rotation.z -= 0.05 * delta;
+      const posAttr = tunnelGeo.attributes.position;
+      const p = posAttr.array;
+      const factor = flyState.progress;
+
+      for(let i = 0; i < p.length; i += 3) {
+        const oX = tunnelOriginalPos[i];
+        const oY = tunnelOriginalPos[i+1];
+        const oZ = tunnelOriginalPos[i+2];
+
+        const currentAngle = Math.atan2(oZ, oX);
+        const currentRadius = Math.sqrt(oX*oX + oZ*oZ);
+
+        const expandedRadius = currentRadius + (factor * 30) + (Math.sin(oY * 0.5) * factor * 5);
+        const twistedAngle = currentAngle + (factor * oY * 0.05);
+
+        p[i] = Math.cos(twistedAngle) * expandedRadius;
+        p[i+1] = oY; 
+        p[i+2] = Math.sin(twistedAngle) * expandedRadius;
+      }
+      posAttr.needsUpdate = true;
+
+      const tPos = terrainGeo.attributes.position;
+      for (let i = 0; i < tPos.count; i++) {
+        const x = tPos.getX(i);
+        const y = tPos.getY(i);
+        const wave1 = Math.sin(x * 0.05 + time * 0.5) * 2;
+        const wave2 = Math.cos(y * 0.05 + time * 0.4) * 2;
+        const wave3 = Math.sin((x + y) * 0.02 + time * 0.8) * 1.5;
+        tPos.setZ(i, wave1 + wave2 + wave3);
+      }
+      tPos.needsUpdate = true;
+
+      shards.forEach((shard) => {
+        shard.rotation.x += shard.userData.rotSpeedX * delta;
+        shard.rotation.y += shard.userData.rotSpeedY * delta;
+        const angle = (time * shard.userData.orbitSpeed) + shard.userData.offsetAngle;
+        shard.position.x = Math.cos(angle) * shard.userData.orbitRadius;
+        shard.position.y = Math.sin(angle) * (shard.userData.orbitRadius * 0.8);
+        shard.position.z = Math.sin(angle * 0.5) * 2; 
+      });
+
+      particlesMesh.position.z += 6 * delta + (flyState.progress * 3); 
+      if(particlesMesh.position.z > 50) particlesMesh.position.z = -50;
+    }
+
+    camera.position.z = 10 - (flyState.progress * 40);
+    camera.position.x = targetX * 6;
+    camera.position.y = -targetY * 6;
+    camera.lookAt(0,0, camera.position.z - 10);
+    
+    // Lerping the shared material updates the whole complex core at once
+    coreMat.color.lerpColors(colorLime, colorMagenta, flyState.progress);
+    tunnelMat.color.lerpColors(colorViolet, colorLime, flyState.progress);
+    terrainMat.color.lerpColors(colorViolet, colorCyan, flyState.progress);
+    terrainMat.opacity = 0.01 + (flyState.progress * 0.18);
+    
+    rgbShiftPass.uniforms['amount'].value = 0.001 + (flyState.progress * 0.004);
+    coreMat.opacity = 0.15 + (flyState.progress * 0.3);
+    
+    composer.render();
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  const flyBar = document.getElementById('fly-bar');
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#fly', start: 'top top', end: '+=300%', scrub: 1, pin: true,
+      onUpdate: self => flyBar.style.width = `${self.progress * 100}%`
+    }
+  });
+
+  tl.to(flyState, { progress: 1, ease: 'none', duration: 1 }, 0);
+  
+  function transitionCap(outId, inId, posOut, posIn) {
+    tl.to(`${outId} .cap-content`, { opacity: 0, y: -40, filter: 'blur(10px)', duration: 0.1 }, posOut);
+    tl.fromTo(`${inId} .cap-content`, { opacity: 0, y: 40, filter: 'blur(10px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.1 }, posIn);
+  }
+
+  gsap.set(['#cap-2 .cap-content', '#cap-3 .cap-content', '#cap-4 .cap-content'], { opacity: 0, y: 40, filter: 'blur(10px)' });
+  gsap.set('#cap-1 .cap-content', { opacity: 1, y: 0, filter: 'blur(0px)' });
+
+  transitionCap('#cap-1', '#cap-2', 0.15, 0.25);
+  transitionCap('#cap-2', '#cap-3', 0.45, 0.55);
+  transitionCap('#cap-3', '#cap-4', 0.75, 0.85);
+
+</script>
+</body>
+</html>

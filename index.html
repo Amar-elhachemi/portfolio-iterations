@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Showcase Index | Amar Elhachemi Cherki</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="cursor" id="cursor"></div>
+    <div class="trail-dot" id="trail"></div>
+    
+    <!-- Three.js Canvas -->
+    <canvas id="scene-canvas"></canvas>
+    <div class="noise"></div>
+
+    <div class="scroll-container">
+        <!-- Intro Hero -->
+        <section class="panel hero">
+            <div class="content-box-hero reveal">
+                <span class="mono eyebrow">// The Archive</span>
+                <h1 class="display">Portfolio<br><span class="glitchword">Iterations</span></h1>
+                <p>Scroll to explore 6 distinct architectural studies in web design.</p>
+                <div class="scroll-indicator mono">SCROLL DOWN ↓</div>
+            </div>
+        </section>
+
+        <!-- Iteration 1 -->
+        <section class="panel item">
+            <div class="content-box reveal" style="margin-left: 10%;">
+                <iframe class="preview-iframe" src="iterations/1.html" loading="lazy" tabindex="-1"></iframe>
+                <div class="content-overlay">
+                    <span class="mono eyebrow">// V01</span>
+                    <h2 class="display">Iteration One</h2>
+                    <p>The genesis. A foundation built on clean structural principles.</p>
+                    <a href="iterations/1.html" class="btn-primary">Enter Iteration 1</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Iteration 2 -->
+        <section class="panel item">
+            <div class="content-box reveal" style="margin-left: auto; margin-right: 10%;">
+                <iframe class="preview-iframe" src="iterations/2.html" loading="lazy" tabindex="-1"></iframe>
+                <div class="content-overlay">
+                    <span class="mono eyebrow">// V02</span>
+                    <h2 class="display">Iteration Two</h2>
+                    <p>Pushing the envelope with refined spacing and typography.</p>
+                    <a href="iterations/2.html" class="btn-primary">Enter Iteration 2</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Iteration 3 -->
+        <section class="panel item">
+            <div class="content-box reveal" style="margin-left: 15%;">
+                <iframe class="preview-iframe" src="iterations/3.html" loading="lazy" tabindex="-1"></iframe>
+                <div class="content-overlay">
+                    <span class="mono eyebrow">// V03</span>
+                    <h2 class="display">Iteration Three</h2>
+                    <p>Introduction of dynamic states and deeper aesthetic tokens.</p>
+                    <a href="iterations/3.html" class="btn-primary">Enter Iteration 3</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Iteration 4 -->
+        <section class="panel item">
+            <div class="content-box reveal" style="margin-left: auto; margin-right: 15%;">
+                <iframe class="preview-iframe" src="iterations/4.html" loading="lazy" tabindex="-1"></iframe>
+                <div class="content-overlay">
+                    <span class="mono eyebrow">// V04</span>
+                    <h2 class="display">Iteration Four</h2>
+                    <p>Breaking the grid. Exploring deliberate noise and jitter.</p>
+                    <a href="iterations/4.html" class="btn-primary">Enter Iteration 4</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Iteration 5 -->
+        <section class="panel item">
+            <div class="content-box reveal" style="margin-left: 5%;">
+                <iframe class="preview-iframe" src="iterations/5.html" loading="lazy" tabindex="-1"></iframe>
+                <div class="content-overlay">
+                    <span class="mono eyebrow">// V05</span>
+                    <h2 class="display">Iteration Five</h2>
+                    <p>Merging the physical with the digital via complex DOM trees.</p>
+                    <a href="iterations/5.html" class="btn-primary">Enter Iteration 5</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Iteration 6 -->
+        <section class="panel item">
+            <div class="content-box reveal" style="margin-left: auto; margin-right: 5%;">
+                <iframe class="preview-iframe" src="iterations/6.html" loading="lazy" tabindex="-1"></iframe>
+                <div class="content-overlay">
+                    <span class="mono eyebrow">// V06</span>
+                    <h2 class="display"><span class="glitchword">The Climax</span></h2>
+                    <p>The final form. WebGL, GSAP, and absolute control.</p>
+                    <a href="iterations/6.html" class="btn-primary">Enter Iteration 6</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Outro -->
+        <section class="panel hero" id="outro-section" style="min-height: 100vh;">
+            <div class="content-box-hero reveal">
+                <h2 class="display">END OF LINE</h2>
+                <p>All iterations preserved in the void.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/RGBShiftShader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Ambient Audio Drone (Web Audio API) ---
+        const audioBtn = document.createElement('div');
+        audioBtn.className = 'mono';
+        audioBtn.style.position = 'fixed';
+        audioBtn.style.top = '40px';
+        audioBtn.style.right = '40px';
+        audioBtn.style.zIndex = '9999';
+        audioBtn.style.cursor = 'none'; // custom cursor
+        audioBtn.style.opacity = '0.5';
+        audioBtn.style.transition = 'opacity 0.3s ease';
+        audioBtn.innerHTML = 'AUDIO: OFF <span style="font-size:10px">▶</span>';
+        document.body.appendChild(audioBtn);
+
+        audioBtn.addEventListener('mouseenter', () => cursor.classList.add('hot'));
+        audioBtn.addEventListener('mouseleave', () => cursor.classList.remove('hot'));
+
+        let audioCtx, masterGain;
+        let isAudioPlaying = false;
+
+        function initAudio() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0;
+            masterGain.connect(audioCtx.destination);
+            
+            // Create a dark ambient drone using multiple oscillators
+            function createDrone(freq, type, detune) {
+                const osc = audioCtx.createOscillator();
+                const lfo = audioCtx.createOscillator();
+                const lfoGain = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.value = freq;
+                osc.detune.value = detune;
+                
+                lfo.type = 'sine';
+                lfo.frequency.value = Math.random() * 0.15 + 0.05; // slow modulation
+                lfoGain.gain.value = 80;
+                
+                lfo.connect(lfoGain);
+                lfoGain.connect(osc.detune);
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 400;
+                filter.Q.value = 2;
+                
+                osc.connect(filter);
+                filter.connect(masterGain);
+                
+                osc.start();
+                lfo.start();
+                return filter;
+            }
+            
+            // Deep bass drone (Root note)
+            createDrone(55, 'sawtooth', 0); // A1
+            // Sub
+            createDrone(27.5, 'sine', 0);   // A0
+            // Fifth
+            createDrone(82.41, 'sine', 10); // E2
+            // High airy harmonic
+            createDrone(220, 'triangle', -5); // A3
+            
+            // Add a slow sweeping filter effect
+            const filterLfo = audioCtx.createOscillator();
+            filterLfo.type = 'sine';
+            filterLfo.frequency.value = 0.05; // 20 second sweep
+            
+            const filterLfoGain = audioCtx.createGain();
+            filterLfoGain.gain.value = 300;
+            
+            // We just let the LFO run freely.
+            filterLfo.connect(filterLfoGain);
+            filterLfo.start();
+        }
+
+        audioBtn.addEventListener('click', () => {
+            if (!audioCtx) initAudio();
+            
+            if (isAudioPlaying) {
+                masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 1);
+                audioBtn.innerHTML = 'AUDIO: OFF <span style="font-size:10px">▶</span>';
+                audioBtn.style.opacity = '0.5';
+            } else {
+                audioCtx.resume();
+                masterGain.gain.setTargetAtTime(0.4, audioCtx.currentTime, 2);
+                audioBtn.innerHTML = 'AUDIO: ON <span style="font-size:10px">❚❚</span>';
+                audioBtn.style.opacity = '1';
+            }
+            isAudioPlaying = !isAudioPlaying;
+        });
+
+        // --- Custom Cursor ---
+        const cursor = document.getElementById('cursor');
+        const trail = document.getElementById('trail');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let trailX = mouseX;
+        let trailY = mouseY;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
+
+        function animateTrail() {
+            trailX += (mouseX - trailX) * 0.15;
+            trailY += (mouseY - trailY) * 0.15;
+            trail.style.left = trailX + 'px';
+            trail.style.top = trailY + 'px';
+            requestAnimationFrame(animateTrail);
+        }
+        animateTrail();
+
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hot'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hot'));
+        });
+
+        // --- Glitch Scramble Text ---
+        const CHARS = "!<>-_\\\\/[]{}—=+*^?#01";
+        function scramble(el) {
+            const original = el.dataset.original || el.textContent;
+            el.dataset.original = original;
+            let iter = 0;
+            clearInterval(el._scrambleTimer);
+            el._scrambleTimer = setInterval(() => {
+                el.textContent = original.split("").map((ch, i) => {
+                    if (ch === ' ') return ' ';
+                    if (i < iter) return original[i];
+                    return CHARS[Math.floor(Math.random() * CHARS.length)];
+                }).join("");
+                iter += original.length / 10;
+                if (iter >= original.length) {
+                    clearInterval(el._scrambleTimer);
+                    el.textContent = original;
+                }
+            }, 30);
+        }
+        document.querySelectorAll('.btn-primary').forEach(el => {
+            el.addEventListener('mouseenter', () => scramble(el));
+        });
+
+        // --- 3D Card Tilt & Glow Effect ---
+        document.querySelectorAll('.content-box').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Set CSS variables for the radial glow
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+                
+                // Calculate 3D tilt angles (max 10 degrees)
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10;
+                const rotateY = ((x - centerX) / centerX) * 10;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+
+        // --- Three.js WebGL Scene ---
+        const canvas = document.getElementById('scene-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0A0A0F, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 400);
+        camera.position.set(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+
+        // Post Processing (Bloom & RGB Shift)
+        const composer = new THREE.EffectComposer(renderer);
+        composer.addPass(new THREE.RenderPass(scene, camera));
+        
+        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0.2;
+        bloomPass.strength = 1.2; // intense glow
+        bloomPass.radius = 0.5;
+        composer.addPass(bloomPass);
+
+        const rgbShiftPass = new THREE.ShaderPass(THREE.RGBShiftShader);
+        rgbShiftPass.uniforms['amount'].value = 0.0015;
+        composer.addPass(rgbShiftPass);
+
+        // --- The Constellation / Nebula Tunnel ---
+        const particleCount = 4000; // Increased particle count
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        
+        // New Purple-shifted Palette
+        const palette = [
+            new THREE.Color(0xB52FF7), // Primary Purple
+            new THREE.Color(0xFF2E92), // Magenta
+            new THREE.Color(0x00F0FF), // Cyan highlight
+            new THREE.Color(0xFF5A1F)  // Orange accent
+        ];
+
+        for(let i=0; i<particleCount; i++) {
+            // Tunnel spread, extending much deeper into Z (-250)
+            positions[i*3] = (Math.random() - 0.5) * 60;
+            positions[i*3+1] = (Math.random() - 0.5) * 60;
+            positions[i*3+2] = (Math.random() - 0.5) * -300; 
+            
+            const color = palette[Math.floor(Math.random() * palette.length)];
+            colors[i*3] = color.r;
+            colors[i*3+1] = color.g;
+            colors[i*3+2] = color.b;
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        // Create a circular dot texture
+        const dotCanvas = document.createElement('canvas');
+        dotCanvas.width = 64; dotCanvas.height = 64;
+        const ctx = dotCanvas.getContext('2d');
+        const grad = ctx.createRadialGradient(32,32,0, 32,32,32);
+        grad.addColorStop(0, 'rgba(255,255,255,1)');
+        grad.addColorStop(0.5, 'rgba(255,255,255,0.5)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0,0,64,64);
+        const dotTex = new THREE.CanvasTexture(dotCanvas);
+
+        const material = new THREE.PointsMaterial({
+            size: 0.8,
+            vertexColors: true,
+            map: dotTex,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        // --- More Complex 3D Shapes (Adding weight to V5/V6) ---
+        const monoliths = [];
+        
+        function createShape(geo, zOffset) {
+            const mat = new THREE.MeshBasicMaterial({ 
+                color: palette[Math.floor(Math.random() * palette.length)], 
+                wireframe: true, 
+                transparent: true, 
+                opacity: 0.4 
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 40,
+                zOffset
+            );
+            mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+            mesh.userData.rotSpeedX = (Math.random() - 0.5) * 0.02;
+            mesh.userData.rotSpeedY = (Math.random() - 0.5) * 0.02;
+            scene.add(mesh);
+            monoliths.push(mesh);
+        }
+
+        // Add standard icosahedrons
+        const icosaGeo = new THREE.IcosahedronGeometry(2, 0);
+        for(let i=0; i<15; i++) {
+            createShape(icosaGeo, -10 - (Math.random() * 150));
+        }
+
+        // Add dense rings and tetrahedrons deep in the archive (V5/V6 area, z: -100 to -250)
+        const torusGeo = new THREE.TorusGeometry(3, 0.5, 8, 24);
+        const tetraGeo = new THREE.TetrahedronGeometry(3);
+        
+        for(let i=0; i<20; i++) {
+            // Cluster these deeper in the z-axis
+            const deepZ = -100 - (Math.random() * 150);
+            createShape(Math.random() > 0.5 ? torusGeo : tetraGeo, deepZ);
+        }
+
+        // --- GSAP ScrollTrigger ---
+        let scrollProgress = 0;
+        ScrollTrigger.create({
+            trigger: "body",
+            start: "top top",
+            end: "bottom bottom",
+            onUpdate: (self) => {
+                scrollProgress = self.progress;
+            }
+        });
+
+        // --- NEBULA EXPLOSION FINALE ---
+        // We track the progress of just the final section to trigger the explosion
+        let explosionProgress = 0;
+        ScrollTrigger.create({
+            trigger: "#outro-section",
+            start: "top center", // Starts when outro reaches center of screen
+            end: "bottom bottom",
+            scrub: true,
+            onUpdate: (self) => {
+                explosionProgress = self.progress;
+            }
+        });
+
+        // Parallax elements fade in via intersection observer
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(en => {
+                if (en.isIntersecting) {
+                    en.target.classList.add('in');
+                } else {
+                    en.target.classList.remove('in');
+                }
+            });
+        }, { threshold: 0.2, rootMargin: "0px 0px -100px 0px" });
+        
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        // --- Animation Loop ---
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            const dt = clock.getDelta();
+
+            // Smooth camera movement through the tunnel
+            // Total tunnel depth is around -250
+            const targetZ = scrollProgress * -250;
+            camera.position.z += (targetZ - camera.position.z) * 0.1;
+            
+            // Mouse parallax for camera rotation
+            const targetRotX = (mouseY / window.innerHeight - 0.5) * 0.2;
+            const targetRotY = (mouseX / window.innerWidth - 0.5) * 0.2;
+            camera.rotation.x += (targetRotX - camera.rotation.x) * 0.05;
+            camera.rotation.y += (targetRotY - camera.rotation.y) * 0.05;
+
+            // Slowly rotate the whole particle system
+            particles.rotation.z += dt * 0.05;
+
+            // Rotate monoliths
+            monoliths.forEach(m => {
+                m.rotation.x += m.userData.rotSpeedX;
+                m.rotation.y += m.userData.rotSpeedY;
+            });
+
+            // --- Nebula Explosion Logic ---
+            if (explosionProgress > 0) {
+                // Exponential scaling for the explosion
+                const scale = 1 + Math.pow(explosionProgress * 4, 3); 
+                particles.scale.set(scale, scale, 1); // Expand outwards X/Y
+                
+                // Overdrive the bloom
+                bloomPass.strength = 1.2 + (explosionProgress * 4.0);
+                
+                // Glitch the RGB Shift
+                rgbShiftPass.uniforms['amount'].value = 0.0015 + (Math.random() * explosionProgress * 0.05);
+            } else {
+                // Normal pulse
+                particles.scale.set(1, 1, 1);
+                bloomPass.strength = 1.2;
+                rgbShiftPass.uniforms['amount'].value = 0.0015 + Math.sin(clock.elapsedTime * 2) * 0.0005;
+            }
+
+            composer.render();
+        }
+        animate();
+
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
